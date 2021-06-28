@@ -1,0 +1,63 @@
+PODS:
+  - dsBridge (3.0.6)
+  - Expecta (1.0.6)
+  - NETPPTDownloadHandler (0.1.0):
+    - SSZipArchive
+    - Whiteboard
+  - Specta (1.0.7)
+  - SSZipArchive (2.4.2)
+  - Whiteboard (2.13.4):
+    - Whiteboard/Base (= 2.13.4)
+    - Whiteboard/Converter (= 2.13.4)
+    - Whiteboard/Model (= 2.13.4)
+    - Whiteboard/NativeReplayer (= 2.13.4)
+    - Whiteboard/Object (= 2.13.4)
+    - Whiteboard/Replayer (= 2.13.4)
+    - Whiteboard/Room (= 2.13.4)
+  - Whiteboard/Base (2.13.4):
+    - dsBridge (~> 3.0.2)
+    - Whiteboard/Object
+  - Whiteboard/Converter (2.13.4):
+    - Whiteboard/Object
+  - Whiteboard/Model (2.13.4):
+    - YYModel (~> 1.0.4)
+  - Whiteboard/NativeReplayer (2.13.4):
+    - Whiteboard/Replayer
+  - Whiteboard/Object (2.13.4):
+    - Whiteboard/Model
+  - Whiteboard/Replayer (2.13.4):
+    - Whiteboard/Base
+  - Whiteboard/Room (2.13.4):
+    - Whiteboard/Base
+  - YYModel (1.0.4)
+
+DEPENDENCIES:
+  - Expecta
+  - NETPPTDownloadHandler (from `../`)
+  - Specta
+
+SPEC REPOS:
+  trunk:
+    - dsBridge
+    - Expecta
+    - Specta
+    - SSZipArchive
+    - Whiteboard
+    - YYModel
+
+EXTERNAL SOURCES:
+  NETPPTDownloadHandler:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  dsBridge: 48b62ee8a411ad601a88d6f6c8cf6cb634b206b7
+  Expecta: 3b6bd90a64b9a1dcb0b70aa0e10a7f8f631667d5
+  NETPPTDownloadHandler: 756d3d2af3df55831d3fe54a60699c0b311b01ef
+  Specta: 3e1bd89c3517421982dc4d1c992503e48bd5fe66
+  SSZipArchive: e7b4f3d9e780c2acc1764cd88fbf2de28f26e5b2
+  Whiteboard: 7705d41f1f78dff096958c3b49ea87a8d815017f
+  YYModel: 2a7fdd96aaa4b86a824e26d0c517de8928c04b30
+
+PODFILE CHECKSUM: f5ba10efb04f2b3e5ec359ad50170b2461edafd0
+
+COCOAPODS: 1.10.1

@@ -7,9 +7,9 @@
 //
 
 #import "NETViewController.h"
-
+#import <NETPPTDownloadHandler/NETPPTDownloader.h>
 @interface NETViewController ()
-
+@property (nonatomic, strong) NETPPTDownloader *pptDownloader;
 @end
 
 @implementation NETViewController
@@ -18,6 +18,8 @@
 {
     [super viewDidLoad];
 	// Do any additional setup after loading the view, typically from a nib.
+    self.pptDownloader = [[NETPPTDownloader alloc] initWithDir:[NSURL URLWithString:NSTemporaryDirectory()]];
+    
 }
 
 - (void)didReceiveMemoryWarning

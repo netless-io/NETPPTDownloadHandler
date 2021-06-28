@@ -29,6 +29,8 @@ TODO: Add long description of the pod here.
   # s.social_media_url = 'https://twitter.com/<TWITTER_USERNAME>'
 
   s.ios.deployment_target = '9.0'
+  s.dependency 'SSZipArchive'
+  s.dependency 'Whiteboard'
 
   s.source_files = 'NETPPTDownloadHandler/Classes/**/*'
   
