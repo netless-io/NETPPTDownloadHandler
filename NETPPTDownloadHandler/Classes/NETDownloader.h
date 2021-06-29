@@ -15,7 +15,7 @@ typedef void(^NETDownloaderCompletionHandler)(NSURL * _Nullable location, NSURLR
 
 @property (copy, nonatomic, readonly) NSString *uuid;
 @property (copy, nonatomic, readonly) NSURL *baseURL;
-@property (copy, nonatomic) NSDictionary *fileInfo;
+@property (copy, nonatomic) NSDictionary *downloadFilesInfo;
 
 - (instancetype)init NS_UNAVAILABLE;
 - (instancetype)initWithUUID:(NSString *)uuid;

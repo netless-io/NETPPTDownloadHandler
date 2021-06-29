@@ -99,7 +99,6 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
     [self.downloader downloadPresentationZip:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         NSLog(@"download Presentation location:%@ response:%@ error:%@", location.absoluteString, response, [error description]);
         
-
         NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
         if (urlResponse.statusCode >= 200 && urlResponse.statusCode < 400) {
 
@@ -108,7 +107,7 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
             NSData *data = [NSData dataWithContentsOfURL:[weakSelf.fileManager bigFile:uuid]];
             if (data && [weakSelf.downloader.uuid isEqualToString:uuid]) {
                 NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
-                weakSelf.downloader.fileInfo = json;
+                weakSelf.downloader.downloadFilesInfo = json;
             }
         } else if (!error) {
             NSDictionary *userInfo = @{NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedStringFromTable(@"Request failed: %@ (%ld)", @"NETPPTDownloader", nil), [NSHTTPURLResponse localizedStringForStatusCode:urlResponse.statusCode],   (long)urlResponse.statusCode],
@@ -131,7 +130,7 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
 
     if (nextSlideIndex > [self.fileManager slideCount:uuid]) {
         NSLog(@"finish at SlideIndex: %ld", nextSlideIndex - 1);
-        [self downloadShareResource:@""];
+        [self downloadShareResource:nil];
         return;
     } else if ([self.fileManager isSlideZipFinishDownload:uuid slideIndex:nextSlideIndex]) {
         NSLog(@"slideIndex: %ld is already download", nextSlideIndex - 1);
@@ -174,7 +173,7 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
     
     NSInteger nextSlideIndex = self.slideIndex + 1;
     NSString *slideIndexKey = [NSString stringWithFormat:@"%ld", (long)nextSlideIndex];
-    NSArray<NSDictionary *> *list = self.downloader.fileInfo[slideIndexKey];
+    NSArray<NSDictionary *> *list = self.downloader.downloadFilesInfo[slideIndexKey];
 
     NSInteger __block index = -1;
     [list enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -186,22 +185,26 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
     return index;
 }
 
-- (void)downloadShareResource:(NSString *)lastName {
+- (void)downloadShareResource:(NSString * _Nullable)lastName {
     
     NSInteger nextSlideIndex = self.slideIndex + 1;
     NSString *uuid = self.downloader.uuid;
+    
+    if (nextSlideIndex > [self.fileManager slideCount:uuid]) {
+        return;
+    }
 
-    if (![self.fileManager isSlideZipFinishDownload:uuid slideIndex:nextSlideIndex] && nextSlideIndex < [self.fileManager slideCount:uuid]) {
+    if (![self.fileManager isSlideZipFinishDownload:uuid slideIndex:nextSlideIndex]) {
         [self downloadNextSlide];
         return;
     }
     
-    if (!self.downloader.fileInfo) {
+    if (!self.downloader.downloadFilesInfo) {
         return;
     }
     
     NSString *slideIndexKey = [NSString stringWithFormat:@"%ld", (long)nextSlideIndex];
-    NSArray<NSDictionary *> *list = self.downloader.fileInfo[slideIndexKey];
+    NSArray<NSDictionary *> *list = self.downloader.downloadFilesInfo[slideIndexKey];
 
     NSInteger index = [self inNextSlide:lastName];
     
@@ -212,7 +215,12 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
     }
     if (!name) {
         self.slideIndex += 1;
-        [self downloadShareResource:@""];
+        [self downloadShareResource:nil];
+        return;
+    }
+    
+    if ([self.fileManager isFileExistIn:uuid name:name]) {
+        [self downloadShareResource:name];
         return;
     }
 
