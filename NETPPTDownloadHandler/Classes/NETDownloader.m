@@ -51,7 +51,7 @@ static NSString *baseURLString = @"https://convertcdn.netless.link";
 
 - (void)downloadSlideResource:(NSInteger)slideIndex completionHandler:(NETDownloaderCompletionHandler)completionHandler
 {
-    [self download:[self slideZip:slideIndex] completionHandler:completionHandler];
+    [self download:[self resourceSlideZip:slideIndex] completionHandler:completionHandler];
 }
 
 - (void)downloadResource:(NSString *)name completionHandler:(NETDownloaderCompletionHandler)completionHandler {
@@ -98,7 +98,7 @@ static NSString *baseURLString = @"https://convertcdn.netless.link";
     return [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"/dynamicConvert/%@/presentationML.zip", self.uuid] relativeToURL:self.baseURL]];
 }
 
-- (NSURLRequest *)slideZip:(NSInteger )slideIndex {
+- (NSURLRequest *)resourceSlideZip:(NSInteger )slideIndex {
     return [[NSURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"/dynamicConvert/%@/resources/resource%ld.zip", self.uuid, (long)slideIndex] relativeToURL:self.baseURL]];
 }
 

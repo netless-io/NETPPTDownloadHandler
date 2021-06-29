@@ -19,18 +19,25 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, readonly, copy) NSString *directory;
 
-- (NSURL *)publicFilesDirectory;
+- (NSURL *)publicFilesDir;
+
 - (BOOL)isPublicFilesExist;
-- (BOOL)isPresentationExist:(NSString *)uuid;
-- (BOOL)isShareJSONExist:(NSString *)uuid;
-- (BOOL)isSlideResourceZipFinish:(NSString *)uuid slideIndex:(NSInteger)slideIndex;
-- (BOOL)isResourceExistIn:(NSString *)uuid name:(NSString *)name;
-- (BOOL)unzipPptZip:(NSURL *)zip uuid:(NSString *)uuid;
+- (BOOL)isPresentationFinishDownload:(NSString *)uuid;
+- (BOOL)hasBigFileJSON:(NSString *)uuid;
+- (BOOL)isFileExistIn:(NSString *)uuid name:(NSString *)name;
+
+- (BOOL)isSlideZipFinishDownload:(NSString *)uuid slideIndex:(NSInteger)slideIndex;
+- (void)registerSlideResource:(NSString *)uuid slideIndex:(NSInteger)slideInde;
+
+- (BOOL)unzip:(NSURL *)zip toDestination:(NSURL *)url;
+- (BOOL)unzip:(NSURL *)zip toUUID:(NSString *)uuid;
 
 - (NSURL *)uuidDirectory:(NSString *)uuid;
-- (NSURL *)shareJSONFile:(NSString *)uuid;
-- (NSURL *)infoJSONFile:(NSString *)uuid;
-- (NSURL *)resourceFileIn:(NSString *)uuid name:(NSString *)name;
+- (NSURL *)bigFile:(NSString *)uuid;
+- (NSURL *)infoJSON:(NSString *)uuid;
+- (NSURL *)fileIn:(NSString *)uuid name:(NSString *)name;
+
+- (NSString *)directorySize;
 - (NSInteger)slideCount:(NSString *)uuid;
 
 @end
