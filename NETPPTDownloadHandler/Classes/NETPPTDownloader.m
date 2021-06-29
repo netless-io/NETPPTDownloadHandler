@@ -36,12 +36,13 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
 
 // for unitTest
 - (void)prepareDownload:(NSString *)uuid slideIndex:(NSInteger)slideIndex {
-    if (![self.downloader.uuid isEqualToString:uuid]) {
-        [self.downloader invalidateAndCancel];
-    }
     self.downloadSlideIndex = slideIndex;
     self.slideIndex = slideIndex;
-    self.downloader = [[NETDownloader alloc] initWithUUID:uuid];
+    
+    if (![self.downloader.uuid isEqualToString:uuid]) {
+        [self.downloader invalidateAndCancel];
+        self.downloader = [[NETDownloader alloc] initWithUUID:uuid];
+    }
     [self startDownload];
 }
 
