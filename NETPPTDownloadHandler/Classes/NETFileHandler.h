@@ -26,9 +26,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)hasBigFileJSON:(NSString *)uuid;
 - (BOOL)isFileExistIn:(NSString *)uuid name:(NSString *)name;
 
-- (BOOL)isSlideZipFinishDownload:(NSString *)uuid slideIndex:(NSInteger)slideIndex;
-- (void)registerSlideResource:(NSString *)uuid slideIndex:(NSInteger)slideInde;
-
 - (BOOL)unzip:(NSURL *)zip toDestination:(NSURL *)url;
 - (BOOL)unzip:(NSURL *)zip toUUID:(NSString *)uuid;
 
@@ -37,6 +34,8 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSURL *)infoJSON:(NSString *)uuid;
 - (NSURL *)fileIn:(NSString *)uuid name:(NSString *)name;
 
+- (NSDictionary * _Nullable)downloadRecord:(NSString *)uuid;
+- (void)writeRecord:(NSDictionary *)info toUUID:(NSString *)uuid;
 - (NSString *)directorySize;
 - (NSInteger)slideCount:(NSString *)uuid;
 

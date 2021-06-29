@@ -111,38 +111,20 @@ static NSString *kSlideDownloadJSON = @"slideDownload.json";
     return [[NSFileManager defaultManager] fileExistsAtPath:[self fileIn:uuid name:name].path];
 }
 
-- (BOOL)isSlideZipFinishDownload:(NSString *)uuid slideIndex:(NSInteger)slideIndex
-{
+- (void)writeRecord:(NSDictionary *)info toUUID:(NSString *)uuid  {
     NSURL *fileURL = [NSURL fileURLWithPath:kSlideDownloadJSON isDirectory:NO relativeToURL:[self uuidDirectory:uuid]];
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
-        NSString *slideKey = [NSString stringWithFormat:@"%ld", slideIndex];
-
-        NSData *data = [NSData dataWithContentsOfURL:fileURL];
-        NSError *error = nil;
-        NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        return [json[slideKey][@"success"] boolValue];
-    } else {
-        return NO;
-    }
+    NSData *data = [NSJSONSerialization dataWithJSONObject:info options:0 error:nil];
+    [data writeToFile:fileURL.path atomically:YES];
 }
 
-- (void)registerSlideResource:(NSString *)uuid slideIndex:(NSInteger)slideIndex
-{
+- (NSDictionary * _Nullable)downloadRecord:(NSString *)uuid {
     NSURL *fileURL = [NSURL fileURLWithPath:kSlideDownloadJSON isDirectory:NO relativeToURL:[self uuidDirectory:uuid]];
-    NSString *slideKey = [NSString stringWithFormat:@"%ld", slideIndex];
-
-    if ([[NSFileManager defaultManager] fileExistsAtPath:fileURL.path]) {
-        NSData *data = [NSData dataWithContentsOfURL:fileURL];
-        NSError *error = nil;
-        NSMutableDictionary *json = [[NSJSONSerialization JSONObjectWithData:data options:0 error:&error] mutableCopy];
-        json[slideKey] = @(YES);
-        data = [NSJSONSerialization dataWithJSONObject:json options:0 error:nil];
-        [data writeToFile:fileURL.path atomically:YES];
+    NSData *data = [NSData dataWithContentsOfFile:fileURL.path];
+    if (data) {
+        NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+        return dict;
     } else {
-        NSDictionary *json = @{slideKey: @{@"success": @YES}};
-        NSData *data = [NSJSONSerialization dataWithJSONObject:json options:0 error:nil];
-        [data writeToFile:fileURL.path atomically:YES];
+        return nil;
     }
 }
 

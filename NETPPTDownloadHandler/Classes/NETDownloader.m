@@ -26,6 +26,7 @@ static NSString *baseURLString = @"https://convertcdn.netless.link";
         _uuid = uuid;
         _baseURL = baseURL;
         _session = [NSURLSession sharedSession];
+        _downloadRecord = [NSMutableDictionary dictionary];
     }
     return self;
 }
@@ -59,6 +60,34 @@ static NSString *baseURLString = @"https://convertcdn.netless.link";
 }
 
 #pragma mark - Task Control
+
+static NSString *kSuccessKey = @"success";
+
+- (BOOL)isSlideZipFinishDownload:(NSString *)uuid slideIndex:(NSInteger)slideIndex {
+    
+    NSString *slideKey = [NSString stringWithFormat:@"%ld", slideIndex];
+    NSDictionary *info = self.downloadRecord[slideKey];
+    if (!info) {
+        return NO;
+    } else {
+        return [info[kSuccessKey] boolValue];
+    }
+}
+
+- (void)registerSlideResource:(NSString *)uuid slideIndex:(NSInteger)slideIndex {
+    if (![uuid isEqualToString:self.uuid]) {
+        return;
+    }
+    NSString *slideKey = [NSString stringWithFormat:@"%ld", slideIndex];
+    NSMutableDictionary *info = [self.downloadRecord[slideKey] mutableCopy];
+    if (!info) {
+        info = [@{kSuccessKey: @YES} mutableCopy];
+    } else {
+        info[kSuccessKey] = @YES;
+    }
+    self.downloadRecord[slideKey] = info;
+}
+
 - (void)cancelCurrentResource {
     [self.session getTasksWithCompletionHandler:^(NSArray<NSURLSessionDataTask *> * _Nonnull dataTasks, NSArray<NSURLSessionUploadTask *> * _Nonnull uploadTasks, NSArray<NSURLSessionDownloadTask *> * _Nonnull downloadTasks) {
         [downloadTasks enumerateObjectsUsingBlock:^(NSURLSessionDownloadTask * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
