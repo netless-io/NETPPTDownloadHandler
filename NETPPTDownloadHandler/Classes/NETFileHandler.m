@@ -121,7 +121,7 @@ static NSString *kSlideDownloadJSON = @"slideDownload.json";
         NSData *data = [NSData dataWithContentsOfURL:fileURL];
         NSError *error = nil;
         NSDictionary *json = [NSJSONSerialization JSONObjectWithData:data options:0 error:&error];
-        return [json[slideKey] boolValue];
+        return [json[slideKey][@"success"] boolValue];
     } else {
         return NO;
     }
@@ -140,7 +140,7 @@ static NSString *kSlideDownloadJSON = @"slideDownload.json";
         data = [NSJSONSerialization dataWithJSONObject:json options:0 error:nil];
         [data writeToFile:fileURL.path atomically:YES];
     } else {
-        NSDictionary *json = @{slideKey: @YES};
+        NSDictionary *json = @{slideKey: @{@"success": @YES}};
         NSData *data = [NSJSONSerialization dataWithJSONObject:json options:0 error:nil];
         [data writeToFile:fileURL.path atomically:YES];
     }
