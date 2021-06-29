@@ -14,6 +14,7 @@
 @property (nonatomic, strong) NETFileHandler *fileManager;
 @property (nonatomic, strong) NETDownloader *downloader;
 @property (nonatomic, assign) NSInteger slideIndex;
+@property (nonatomic, copy, nullable) NSString *resourceName;
 @end
 
 NSString * const NETPPTResponseSerializationErrorDomain = @"link.netless.error.serialization.response";
@@ -30,6 +31,7 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
     return self;
 }
 
+// for unitTest
 - (void)prepareDownload:(NSString *)uuid slideIndex:(NSInteger)slideIndex {
     if (![self.downloader.uuid isEqualToString:uuid]) {
         [self.downloader invalidateAndCancel];
@@ -45,7 +47,13 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
         return;
     }
     
+    if (self.slideIndex != slideIndex && self.resourceName && [self inNextSlide:self.resourceName]) {
+        [self.downloader cancelCurrentResource];
+    }
+    
+    self.resourceName = nil;
     self.slideIndex = slideIndex;
+
     if (![self.downloader.uuid isEqualToString:uuid]) {
         [self.downloader invalidateAndCancel];
         self.downloader = [[NETDownloader alloc] initWithUUID:uuid baseURL:baseURL];
@@ -137,13 +145,28 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
     }];
 }
 
+- (BOOL)inNextSlide:(NSString *)name {
+    
+    NSInteger nextSlideIndex = self.slideIndex + 1;
+    NSString *slideIndexKey = [NSString stringWithFormat:@"%ld", (long)nextSlideIndex];
+    NSArray<NSDictionary *> *list = self.downloader.shareInfo[slideIndexKey];
+
+    NSInteger __block index = -1;
+    [list enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj[@"name"] isEqualToString:name]) {
+            index = idx;
+            *stop = YES;
+        }
+    }];
+    return index != -1;
+}
+
 - (void)downloadShareResource:(NSString *)lastName {
     
     NSInteger nextSlideIndex = self.slideIndex + 1;
     NSString *uuid = self.downloader.uuid;
 
-    if ([self.fileManager isSlideResourceZipFinish:uuid slideIndex:nextSlideIndex]) {
-        self.slideIndex += 1;
+    if (![self.fileManager isSlideResourceZipFinish:uuid slideIndex:nextSlideIndex]) {
         [self downloadNextSlide];
         return;
     }
@@ -153,15 +176,20 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
     }
     
     NSString *slideIndexKey = [NSString stringWithFormat:@"%ld", (long)nextSlideIndex];
-    NSArray *names = self.downloader.shareInfo[slideIndexKey];
+    NSArray<NSDictionary *> *list = self.downloader.shareInfo[slideIndexKey];
+
+    NSInteger __block index = -1;
+    [list enumerateObjectsUsingBlock:^(NSDictionary * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        if ([obj[@"name"] isEqualToString:lastName]) {
+            index = idx;
+            *stop = YES;
+        }
+    }];
     
-    NSInteger index = [names indexOfObject:lastName];
-    if (index == NSNotFound) {
-        index = 0;
-    }
+    NSInteger nextResourceIndex = index + 1;
     NSString *name;
-    if (names && [names count] >= index + 1) {
-        name = names[index];
+    if ([list count] > nextResourceIndex) {
+        name = list[nextResourceIndex][@"name"];
     }
     if (!name) {
         self.slideIndex += 1;
@@ -169,6 +197,7 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
         return;
     }
 
+    self.resourceName = name;
     __weak typeof(self)weakSelf = self;
     [self.downloader downloadResource:name completionHandler:^(NSURL * _Nullable location, NSURLResponse * _Nullable response, NSError * _Nullable error) {
         if (error) {
@@ -178,6 +207,8 @@ NSString * const NETPPTOperationFailingURLResponseErrorKey = @"link.netless.seri
         } else {
             NSHTTPURLResponse *urlResponse = (NSHTTPURLResponse *)response;
             if (urlResponse.statusCode >= 200 && urlResponse.statusCode < 400) {
+                NSURL *fileURL = [weakSelf.fileManager resourceFileIn:uuid name:name];
+                [NETFileHandler copyItemAtURL:location toURL:fileURL error:nil];
                 if ([weakSelf.delegate respondsToSelector:@selector(downloadShareResource:index:name:error:)]) {
                     [weakSelf.delegate downloadShareResource:uuid index:nextSlideIndex name:name error:nil];
                 }

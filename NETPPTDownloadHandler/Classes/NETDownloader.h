@@ -28,7 +28,7 @@ typedef void(^NETDownloaderCompletionHandler)(NSURL * _Nullable location, NSURLR
 - (void)downloadSlideResource:(NSInteger)slideIndex completionHandler:(NETDownloaderCompletionHandler)completionHandler;
 
 #pragma mark - task
-- (void)cancelCurrentTask;
+- (void)cancelCurrentResource;
 - (void)invalidateAndCancel;
 
 @end

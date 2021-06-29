@@ -9,7 +9,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+
 @interface NETFileHandler : NSObject
+
++ (BOOL)copyItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL error:(NSError **)error;
++ (BOOL)createDirectory:(NSURL *)path error:(NSError **)error;
 
 - (instancetype)initWithDirectory:(NSString *)dir;
 
@@ -20,13 +24,13 @@ NS_ASSUME_NONNULL_BEGIN
 - (BOOL)isPresentationExist:(NSString *)uuid;
 - (BOOL)isShareJSONExist:(NSString *)uuid;
 - (BOOL)isSlideResourceZipFinish:(NSString *)uuid slideIndex:(NSInteger)slideIndex;
-
+- (BOOL)isResourceExistIn:(NSString *)uuid name:(NSString *)name;
 - (BOOL)unzipPptZip:(NSURL *)zip uuid:(NSString *)uuid;
 
 - (NSURL *)uuidDirectory:(NSString *)uuid;
 - (NSURL *)shareJSONFile:(NSString *)uuid;
 - (NSURL *)infoJSONFile:(NSString *)uuid;
-
+- (NSURL *)resourceFileIn:(NSString *)uuid name:(NSString *)name;
 - (NSInteger)slideCount:(NSString *)uuid;
 
 @end

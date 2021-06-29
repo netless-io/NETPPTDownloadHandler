@@ -18,6 +18,40 @@
 static NSString *kSlideDownloadJSON = @"slideDownload.json";
 @implementation NETFileHandler
 
++ (BOOL)copyItemAtURL:(NSURL *)srcURL toURL:(NSURL *)dstURL error:(NSError **)error
+{
+    NSFileManager *defaultManager = [NSFileManager defaultManager];
+    NSError *fileError = nil;
+    
+    if ([defaultManager fileExistsAtPath:dstURL.path]) {
+        [defaultManager removeItemAtURL:dstURL error:&fileError];
+    }
+
+    if (fileError) {
+        *error = fileError;
+        return NO;
+    }
+    
+    NSURL *directoryURL = [dstURL URLByDeletingLastPathComponent];
+    if (![defaultManager fileExistsAtPath:directoryURL.absoluteString]) {
+        BOOL result = [self createDirectory:directoryURL error:&fileError];
+        if (!result) {
+            *error = fileError;
+            return result;
+        }
+    }
+    
+    return [defaultManager moveItemAtURL:srcURL toURL:dstURL error:error];
+}
+
++ (BOOL)createDirectory:(NSURL *)path error:(NSError **)error
+{
+    NSFileManager *defaultManager = [NSFileManager defaultManager];
+    return [defaultManager createDirectoryAtURL:path withIntermediateDirectories:YES attributes:@{} error:error];
+}
+
+
+
 #pragma mark -
 #pragma mark - Instance Methods
 #pragma mark -
@@ -52,6 +86,10 @@ static NSString *kSlideDownloadJSON = @"slideDownload.json";
     return [NSURL fileURLWithPath:@"info.json" isDirectory:YES relativeToURL:[self uuidDirectory:uuid]];
 }
 
+- (NSURL *)resourceFileIn:(NSString *)uuid name:(NSString *)name {
+    return [NSURL fileURLWithPath:name isDirectory:NO relativeToURL:[self uuidDirectory:uuid]];
+}
+
 #pragma mark - PPT
 
 - (BOOL)isPublicFilesExist {
@@ -65,6 +103,10 @@ static NSString *kSlideDownloadJSON = @"slideDownload.json";
 
 - (BOOL)isShareJSONExist:(NSString *)uuid {
     return [[NSFileManager defaultManager] fileExistsAtPath:[self shareJSONFile:uuid].path];
+}
+
+- (BOOL)isResourceExistIn:(NSString *)uuid name:(NSString *)name {
+    return [[NSFileManager defaultManager] fileExistsAtPath:[self resourceFileIn:uuid name:name]];
 }
 
 - (BOOL)isSlideResourceZipFinish:(NSString *)uuid slideIndex:(NSInteger)slideIndex

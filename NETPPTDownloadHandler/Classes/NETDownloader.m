@@ -59,10 +59,11 @@ static NSString *baseURLString = @"https://convertcdn.netless.link";
 }
 
 #pragma mark - Task Control
-- (void)cancelCurrentTask {
+- (void)cancelCurrentResource {
     [self.session getTasksWithCompletionHandler:^(NSArray<NSURLSessionDataTask *> * _Nonnull dataTasks, NSArray<NSURLSessionUploadTask *> * _Nonnull uploadTasks, NSArray<NSURLSessionDownloadTask *> * _Nonnull downloadTasks) {
         [downloadTasks enumerateObjectsUsingBlock:^(NSURLSessionDownloadTask * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj.originalRequest.URL.baseURL.absoluteString isEqualToString:self.baseURL.absoluteString]) {
+            NSString *resourceURLString = obj.originalRequest.URL.absoluteString;
+            if ([resourceURLString hasPrefix:self.baseURL.absoluteString] && ![resourceURLString hasSuffix:@".zip"]) {
                 [obj cancel];
             }
         }];
@@ -72,7 +73,7 @@ static NSString *baseURLString = @"https://convertcdn.netless.link";
 - (void)invalidateAndCancel {
     [self.session getTasksWithCompletionHandler:^(NSArray<NSURLSessionDataTask *> * _Nonnull dataTasks, NSArray<NSURLSessionUploadTask *> * _Nonnull uploadTasks, NSArray<NSURLSessionDownloadTask *> * _Nonnull downloadTasks) {
         [downloadTasks enumerateObjectsUsingBlock:^(NSURLSessionDownloadTask * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            if ([obj.originalRequest.URL.baseURL.absoluteString isEqualToString:self.baseURL.absoluteString]) {
+            if ([obj.originalRequest.URL.absoluteString hasPrefix:self.baseURL.absoluteString]) {
                 [obj cancel];
             }
         }];
