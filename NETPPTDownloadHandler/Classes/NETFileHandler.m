@@ -89,7 +89,7 @@ static NSString *kSlideDownloadJSON = @"slideDownload.json";
 }
 
 - (NSURL *)fileIn:(NSString *)uuid name:(NSString *)name {
-    return [NSURL fileURLWithPath:name isDirectory:NO relativeToURL:[self uuidDirectory:uuid]];
+    return [NSURL fileURLWithPath:name isDirectory:NO relativeToURL:[self baseDirURL]];
 }
 
 #pragma mark - PPT
